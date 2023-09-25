@@ -62,7 +62,8 @@ function loop() {
     //Belly
     belly = belly - 0.3;
     if (belly <= 10) {
-        break;
+        //break;
+        speak('death','game over, man.');
     }
     if (belly > 100) {
         belly = 100;
@@ -76,7 +77,7 @@ function loop() {
     //Mood
     mood = mood - 0.3;
     if (mood <= 10) {
-        break;
+        speak('death','game over, man.');
     }
     if (mood > 100) {
         mood = 100;
@@ -109,7 +110,7 @@ var teFunction = null;
 
 function teStart(functionPass, duration) {
     //Close any complex UI that may mess things up.
-    closeSlots();
+    //closeSlots();
 
     //If the timer is already running, call a cancel on whatever function is active.
     if (teTimer != -1) {
