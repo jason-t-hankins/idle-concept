@@ -61,8 +61,8 @@ var petTable = document.getElementById('petTable');
 function loop() {
     //Belly
     belly = belly - 0.3;
-    if (belly < 10) {
-        belly = 10;
+    if (belly <= 10) {
+        break;
     }
     if (belly > 100) {
         belly = 100;
@@ -75,8 +75,8 @@ function loop() {
 
     //Mood
     mood = mood - 0.3;
-    if (mood < 10) {
-        mood = 10;
+    if (mood <= 10) {
+        break;
     }
     if (mood > 100) {
         mood = 100;
@@ -95,66 +95,12 @@ function loop() {
     teMain();
     speakAnimator();
     rainFall();
-    movePet();
+    //movePet();
     petTalk();
     autoEat();
 }
 
 //+++ Main System Functions +++
-
-//Pet movment
-function movePet() {
-    if (movment === false) {
-        return;
-    }
-
-    var xFlip = false;
-    var yFlip = false;
-
-    if (random100() < 50) {
-        xFlip = invertB(xFlip);
-    }
-
-    if (random100() < 50) {
-        yFlip = invertB(yFlip);
-    }
-
-    if (xFlip === true) {
-        petX += stepSize;
-
-        if (moveCheck(petX, petY) === false) {
-            petX -= stepSize * 2;
-        }
-    } else {
-        petX -= stepSize;
-
-        if (moveCheck(petX, petY) === false) {
-            petX += stepSize * 2;
-        }
-    }
-
-    if (yFlip === true) {
-        petY += stepSize;
-
-        if (moveCheck(petX, petY) === false) {
-            petY -= stepSize * 2;
-        }
-    } else {
-        petY -= stepSize;
-
-        if (moveCheck(petX, petY) === false) {
-            petY += stepSize * 2;
-        }
-    }
-
-    //Set pet position
-    pet.style.left = petX + 'px';
-    pet.style.top = petY + 'px';
-
-    //Match overlay pet interact box to pet position
-    petInteract.style.left = petX + 'px';
-    petInteract.style.top = petY + 60 + 'px'; //Height ajusted for overlay offset from relative pet position.
-}
 
 //Timed event manager
 var teTimer = -1;
@@ -197,7 +143,7 @@ function teMain() {
 //+++ Actions +++
 
 //General Pet chatter
-var sayings = ['ALOvE you VERA much!', 'The sky is pixels!', 'Why do I exist?', 'Pandas are silly', 'Did you know a ripe cranberry will bounce.', 'Im rooting for you!', 'Youre looking sharp today!', 'Orange you smart!', 'Bubble yum keeps it poppin', 'Im really quite frond of you :P', 'Its a fine day with you around..', 'I think your a swell person', 'I hope I never get uninstalled!', "To me, you're the gifypet!", 'Remember to be happy!', 'You make every day special :P', 'The sun never sets on Melonland', 'BOO! I scared you :O', 'Moo! Im a dragon!', 'Bruup', 'AHHchoooooooooo..', 'Mrumph', 'I like you :3', 'Poof! You cant see me now!', 'I got lost in the MoMG Gallery once!', "Buy Ozwomp's Voyage!"];
+var sayings = ['Im rooting for you!', 'I hope I never get uninstalled!'];
 var lastPick = 0;
 var speakDelay = 0;
 
@@ -423,122 +369,6 @@ function teRain(active) {
         underlay.style.opacity = null;
     }
 }
-
-//Slots Game
-function openSlots() {
-    petInteract.style.zIndex = '-1'; //Disable pet interaction
-    overlay.style.backgroundImage = "url('slots/slots.gif')";
-    overlay.innerHTML = '' + '<div id="slots" >' + '<div id="slot-counters">' + '<div class="slot" id="slot1"><img src="slots/slot1.png" /></div>' + '<div class="slot" id="slot2"><img src="slots/slot2.png" /></div>' + '<div class="slot" id="slot3"><img src="slots/slot3.png" /></div>' + '</div>' + '<input id="slot-button" type="button" value="Start! (5c)" onclick="runSlots();" />' + '<input type="button" value="Exit" onclick="closeSlots();" />' + '<p id="slot-text" ><b>Welcome to GifySlots</b><br/>Lets play!</p>' + '</div>';
-}
-
-function closeSlots() {
-    petInteract.style.zIndex = '1'; //Enable pet interaction
-    overlay.style.backgroundImage = 'none';
-    overlay.innerHTML = '';
-}
-var slotIntervals = null;
-var slotLoopCounter = 0;
-var slotNumbers = [1, 1, 1];
-
-function runSlots() {
-    var slotButton = document.getElementById('slot-button');
-    var slotText = document.getElementById('slot-text');
-
-    if (slotIntervals !== null) {
-        if (slotLoopCounter < 15) {
-            return;
-        }
-        clearInterval(slotIntervals[0]);
-        clearInterval(slotIntervals[1]);
-        clearInterval(slotIntervals[2]);
-        slotIntervals = null;
-        slotLoopCounter = 0;
-        slotButton.value = 'Start! (5c)';
-
-        if (slotNumbers[0] == slotNumbers[1] && slotNumbers[1] == slotNumbers[2]) {
-            slotSoundWin.play();
-            slotText.innerHTML = '<b>YOU WON!</b><br/>20c for you :)';
-            speak(petName, "Wow, you're my hero ;3");
-            coins += 20;
-            mood += 20;
-        } else {
-            slotSoundLoose.play();
-            slotText.innerHTML = '<b>Aww :(</b><br/>Try again!';
-            speak(petName, 'Are you wasting my coins? ;-;');
-            mood -= 10;
-        }
-
-        return;
-    } else {
-        if (coins < 5) {
-            errorSound.play();
-            slotText.innerHTML = "<b>YOU'RE POOR</b><br/>You need coins to play..";
-            speak(petName, 'HOW AM I GONNA BUY FOOD NOW!');
-            mood -= 40;
-            return;
-        }
-
-        coins -= 5;
-    }
-
-    var slot1 = document.getElementById('slot1');
-    var slot2 = document.getElementById('slot2');
-    var slot3 = document.getElementById('slot3');
-
-    slotIntervals = [];
-
-    slotIntervals[0] = setInterval(function () {
-        slotSoundClick.play();
-
-        //Loop counter to allow stopping
-        slotLoopCounter++;
-        if (slotLoopCounter > 15) {
-            slotButton.value = 'Stop!';
-        }
-
-        slotNumbers[0]++;
-        if (slotNumbers[0] > 3) {
-            slotNumbers[0] = 1;
-        }
-
-        slot1.innerHTML = slotNumberToFruit(slotNumbers[0]);
-    }, Math.floor(Math.random() * 20 + 1) + 150);
-
-    slotIntervals[1] = setInterval(function () {
-        slotNumbers[1]++;
-        if (slotNumbers[1] > 3) {
-            slotNumbers[1] = 1;
-        }
-
-        slot2.innerHTML = slotNumberToFruit(slotNumbers[1]);
-    }, Math.floor(Math.random() * 20 + 1) + 150);
-
-    slotIntervals[2] = setInterval(function () {
-        slotNumbers[2]++;
-        if (slotNumbers[2] > 3) {
-            slotNumbers[2] = 1;
-        }
-
-        slot3.innerHTML = slotNumberToFruit(slotNumbers[2]);
-    }, Math.floor(Math.random() * 20 + 1) + 150);
-
-    slotButton.value = 'Running!';
-    slotText.innerHTML = '<b>THE SLOTS SPIN :O</b><br/>Good Luck!';
-    slotSoundPull.play();
-}
-
-function slotNumberToFruit(number) {
-    if (number == 1) {
-        return '<img src="slots/slot1.png" />';
-    } else if (number == 2) {
-        return '<img src="slots/slot2.png" />';
-    } else if (number == 3) {
-        return '<img src="slots/slot3.png" />';
-    } else {
-        return '!!';
-    }
-}
-
 //+++ Helpers +++
 
 //Outputs text to the talk box.
