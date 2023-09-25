@@ -144,7 +144,7 @@ function teMain() {
 //+++ Actions +++
 
 //General Pet chatter
-var sayings = ['Im rooting for you!', 'I hope I never get uninstalled!'];
+var sayings = ['ALOvE you VERA much!', 'The sky is pixels!', 'Why do I exist?', 'Pandas are silly', 'Did you know a ripe cranberry will bounce.', 'Im rooting for you!', 'Youre looking sharp today!', 'Orange you smart!', 'Bubble yum keeps it poppin', 'Im really quite frond of you :P', 'Its a fine day with you around..', 'I think your a swell person', 'I hope I never get uninstalled!', "To me, you're the gifypet!", 'Remember to be happy!', 'You make every day special :P', 'The sun never sets on Melonland', 'BOO! I scared you :O', 'Moo! Im a dragon!', 'Bruup', 'AHHchoooooooooo..', 'Mrumph', 'I like you :3', 'Poof! You cant see me now!', 'I got lost in the MoMG Gallery once!', "Buy Ozwomp's Voyage!"];
 var lastPick = 0;
 var speakDelay = 0;
 
