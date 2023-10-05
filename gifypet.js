@@ -84,7 +84,7 @@ function loop() {
     }
     var moodHearts = '';
     for (var i = 0; i < mood / 10 / 2; i++) {
-        moodHearts += '<img class="uiicon" src="ui/heart.gif"/>';
+        moodHearts += '<img class="uiicon" src="https://bestanimations.com/Signs&Shapes/Hearts/animatedloveheart-18.gif"/>';
     }
     moodBox.innerHTML = moodHearts;
 
