@@ -70,7 +70,7 @@ function loop() {
     }
     var bellyHearts = '';
     for (var i = 0; i < belly / 10 / 2; i++) {
-        bellyHearts += '<img class="uiicon" src="ui/meat.png"/>';
+        bellyHearts += '<img class="uiicon" src="https://wiki.mabi.world/images/8/82/Fried_Chicken_Wing.png"/>';
     }
     bellyBox.innerHTML = bellyHearts;
 
