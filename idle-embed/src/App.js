@@ -1,4 +1,5 @@
 import './App.css';
+import Three from './Three';
 
 function App() {
     //Load sounds
@@ -198,6 +199,7 @@ function App() {
                     <tr className="window-body">
                         <td colspan="2">
                             <div id="map">
+                                <Three />
                                 <div id="underlay"></div>
                                 <div id="pet" class="pet">
                                     <div id="petName-tag"></div>
