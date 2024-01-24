@@ -1,105 +1,3 @@
-//+++ General Vars +++
-
-//Settings
-var stepSize = 15;
-
-//System variables
-var petX = 50;
-var petY = 50;
-var talk = '';
-var mood = 50;
-var belly = 50;
-var coins = 10;
-var movment = true;
-
-//Owner configured variables
-var date = new Date(getParameterByName('dob') * 1000);
-var dob = date.getMonth() + 1 + '-' + date.getFullYear();
-
-var petName = getParameterByName('name');
-var element = getParameterByName('element');
-var gender = getParameterByName('gender'); //f m b n
-
-var tableColor = getParameterByName('tablecolor');
-var textColor = getParameterByName('textcolor');
-
-var mapImage = getParameterByName('map');
-if (!mapImage.includes('://')) {
-    //Map
-    mapImage = 'maps/' + mapImage;
-}
-
-var petImage = getParameterByName('pet');
-if (!petImage.includes('://')) {
-    //Pet
-    petImage = 'pets/' + petImage;
-}
-
-var bodyImage = getParameterByName('background');
-if (!bodyImage.includes('://')) {
-    //Pet
-    bodyImage = 'backgrounds/' + bodyImage;
-}
-
-//DOM elements
-var pet = document.getElementById('pet');
-var map = document.getElementById('map');
-var talkBox = document.getElementById('talk');
-var petNameBox = document.getElementById('petName');
-var elementBox = document.getElementById('element');
-var dobBox = document.getElementById('dob');
-var moodBox = document.getElementById('mood');
-var bellyBox = document.getElementById('belly');
-var coinsBox = document.getElementById('coins');
-var petNameTag = document.getElementById('petName-tag');
-var overlay = document.getElementById('overlay');
-var underlay = document.getElementById('underlay');
-var petInteract = document.getElementById('overlay-pet-interact');
-var petTable = document.getElementById('petTable');
-
-//+++ Game Loop +++
-function loop() {
-    //Belly
-    belly = belly - 0.3;
-    if (belly <= 10) {
-        //break;
-        speak('death','game over, man.');
-    }
-    if (belly > 100) {
-        belly = 100;
-    }
-    var bellyHearts = '';
-    for (var i = 0; i < belly / 10 / 2; i++) {
-        bellyHearts += '<img class="uiicon" src="https://wiki.mabi.world/images/8/82/Fried_Chicken_Wing.png"/>';
-    }
-    bellyBox.innerHTML = bellyHearts;
-
-    //Mood
-    mood = mood - 0.3;
-    if (mood <= 10) {
-        speak('death','game over, man.');
-    }
-    if (mood > 100) {
-        mood = 100;
-    }
-    var moodHearts = '';
-    for (var i = 0; i < mood / 10 / 2; i++) {
-        moodHearts += '<img class="uiicon" src="https://bestanimations.com/Signs&Shapes/Hearts/animatedloveheart-18.gif"/>';
-    }
-    moodBox.innerHTML = moodHearts;
-
-    //Coins
-    coins = coins + mood / 600;
-    coinsBox.innerHTML = Math.floor(coins);
-
-    //Function calls
-    teMain();
-    speakAnimator();
-    rainFall();
-    //movePet();
-    petTalk();
-    autoEat();
-}
 
 //+++ Main System Functions +++
 
@@ -428,18 +326,7 @@ function invertB(boolIn) {
     }
 }
 
-//Gets URL parameters
-function getParameterByName(name, url) {
-    if (!url) {
-        url = window.location.href;
-    }
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
+
 
 function shuffle(array) {
     var currentIndex = array.length,
@@ -461,62 +348,6 @@ function shuffle(array) {
     return array;
 }
 
-//+++ GifyPet Startup and Render +++
-
-//Master game loop
-var mainInterval = setInterval(function () {
-    loop();
-}, 1000);
-
-//Apply colour to the table
-for (var i = 0, row; (row = petTable.rows[i]); i++) {
-    row.style.borderColor = tableColor;
-
-    for (var j = 0, col; (col = row.cells[j]); j++) {
-        col.style.borderColor = tableColor;
-    }
-}
-petTable.style.borderColor = tableColor;
-
-//Pick gender icon
-var genderRender = '';
-if (gender == 'f') {
-    genderRender = '<img class="uiicon" src="ui/girl.png"/>';
-} else if (gender == 'm') {
-    genderRender = '<img class="uiicon" src="ui/boy.png"/>';
-} else if (gender == 'b') {
-    genderRender = '<img class="uiicon" src="ui/both.png"/>';
-}
-
-//General render settings
-pet.style.backgroundImage = "url('" + petImage + "')";
-map.style.backgroundImage = "url('" + mapImage + "')";
-petNameTag.innerHTML = petName;
-petNameBox.innerHTML = petName + genderRender;
-dobBox.innerHTML = dob;
-elementBox.innerHTML = element;
-document.body.style.backgroundImage = "url('" + bodyImage + "')";
-document.body.style.color = textColor;
-document.title = petName;
-
-//Register interaction events
-petInteract.addEventListener('pointerover', function () {
-    pet.style.animation = 'wiggle 0.2s linear infinite';
-});
-petInteract.addEventListener('pointerout', function () {
-    pet.style.animation = null;
-});
 
 //Welcome function calls
 speak(petName, "Hello, I'm " + petName + " and you're awesome!");
-
-//Load sounds
-var eatSound = new Audio('audio/ommnom.mp3');
-var partySound = new Audio('audio/song.mp3');
-var washSound = new Audio('audio/shower.mp3');
-var talkSound = new Audio('audio/hello.mp3');
-var errorSound = new Audio('audio/ohno.mp3');
-var slotSoundClick = new Audio('slots/click.mp3');
-var slotSoundPull = new Audio('slots/lever.mp3');
-var slotSoundWin = new Audio('slots/win.mp3');
-var slotSoundLoose = new Audio('slots/loose.mp3');
