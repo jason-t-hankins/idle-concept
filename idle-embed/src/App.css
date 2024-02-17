@@ -49,6 +49,7 @@ td {
   text-align: center;
   background-size: 100%;
   color: white;
+  background-color: aliceblue;
 }
 
 #overlay-pet-interact {
@@ -97,7 +98,7 @@ td {
 
 textarea#talk {
   width: 96%;
-  height: 28px;
+  height: 58px;
   resize: none;
   color: black;
   background-color: white;

@@ -34,6 +34,8 @@ class Three extends Component {
             renderer.render( scene, camera );
         }
 
+        //function stopEarth(){cube.rotation.y = 0;}
+
         animate();
     }
     render() {
