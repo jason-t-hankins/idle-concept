@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/idle-concept/static/css/main.a2d78548.css",
-    "main.js": "/idle-concept/static/js/main.b68571c1.js",
+    "main.css": "/idle-concept/static/css/main.0af3f41e.css",
+    "main.js": "/idle-concept/static/js/main.b09471b6.js",
     "static/js/787.e051da0d.chunk.js": "/idle-concept/static/js/787.e051da0d.chunk.js",
     "static/media/earth.jpg": "/idle-concept/static/media/earth.55d3f3a34afafa8b9b2d.jpg",
     "static/media/ms_sans_serif.woff": "/idle-concept/static/media/ms_sans_serif.aac84aa6de42b83d1a62.woff",
@@ -9,12 +9,12 @@
     "static/media/ms_sans_serif.woff2": "/idle-concept/static/media/ms_sans_serif.0348082abb503fb6a8c2.woff2",
     "static/media/ms_sans_serif_bold.woff2": "/idle-concept/static/media/ms_sans_serif_bold.7fcf57cc6e87ecddbf64.woff2",
     "index.html": "/idle-concept/index.html",
-    "main.a2d78548.css.map": "/idle-concept/static/css/main.a2d78548.css.map",
-    "main.b68571c1.js.map": "/idle-concept/static/js/main.b68571c1.js.map",
+    "main.0af3f41e.css.map": "/idle-concept/static/css/main.0af3f41e.css.map",
+    "main.b09471b6.js.map": "/idle-concept/static/js/main.b09471b6.js.map",
     "787.e051da0d.chunk.js.map": "/idle-concept/static/js/787.e051da0d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a2d78548.css",
-    "static/js/main.b68571c1.js"
+    "static/css/main.0af3f41e.css",
+    "static/js/main.b09471b6.js"
   ]
 }
