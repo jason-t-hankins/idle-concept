@@ -16,14 +16,7 @@ import world from './data/world.png';
 function App() {
     //Load sounds
     //var eatSound = new Audio('audio/ommnom.mp3');
-    //var partySound = new Audio('audio/song.mp3');
-    //var washSound = new Audio('audio/shower.mp3');
-    //var talkSound = new Audio('audio/hello.mp3');
-
-    //var stepSize = 15;
-    //var speakTimer = -1;
-
-    //Owner configured variables
+    
     var petName = 'jj';//getParameterByName('name');
     document.title = petName;
 
@@ -39,9 +32,9 @@ function App() {
     //var map = document.getElementById('map');
     //var talkBox = document.getElementById('talk');
     //var petNameBox = document.getElementById('petName');
-    const [moodBox, setMoodBox] = useState(50);
-    const [hungerBox, setHungerBox] = useState(50);
-    const [coinsBox, setCoinsBox] = useState(10);
+    const [moodBox, setMoodBox] = useState(mood);
+    const [hungerBox, setHungerBox] = useState(hunger);
+    const [coinsBox, setCoinsBox] = useState(coins);
     //var petNameTag = document.getElementById('petName-tag');
     //var overlay = document.getElementById('overlay');
     //var underlay = document.getElementById('underlay');
@@ -50,30 +43,31 @@ function App() {
 
 
     //Master game loop
-    var mainInterval = setInterval(function () {
+    var mainInterval = setInterval(() => {
+        setHunger(hunger - 1);
+        setHungerBox(hunger);
+        setMood(mood - 1);
+        setMoodBox(mood);
+        setCoins(coins + 1/*mood / 600*/);
+        setCoinsBox(coins); //Math.floor(coins)
+
         loop();
-    }, 1000);
+
+    }, 1000); //loop every 1000 ms
 
     //+++ Game Loop +++
     function loop() {
         //Hunger
-        setHunger(hunger - 0.3);
         if (hunger <= 10) {
             //break;
             speak('death',"hey hey, what's up??");
+            clearInterval(mainInterval);
         }
-        setHungerBox(Math.floor(hunger));
-
         //Mood
-        setMood(mood - 0.3);
         if (mood <= 10) {
             speak('death','game over, man.');
         }
-        setMoodBox(Math.floor(mood));
-
         //Coins
-        setCoins(coins + mood / 600);
-        setCoinsBox(Math.floor(coins));
 
         //Function calls
         //teMain();
@@ -82,7 +76,7 @@ function App() {
         //movePet();
         //petTalk();
         //autoEat();
-        speak(petName, "kill, kill");
+        //speak(petName, "kill, kill");
     }
 
 
