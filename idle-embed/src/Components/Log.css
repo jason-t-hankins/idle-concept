@@ -1,0 +1,11 @@
+#log{
+    width: 150px;
+    /*resize: both;
+    overflow: auto;*/
+}
+
+#logArea{
+    background-color: black;
+    color: chartreuse;
+    resize: vertical;
+}

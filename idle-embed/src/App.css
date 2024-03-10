@@ -116,6 +116,7 @@ textarea#talk {
 
 .controls {
   vertical-align: text-top;
+  z-index: 2;
 }
 
 .controls b {
@@ -129,7 +130,7 @@ textarea#talk {
 
 /* +++ Annimations +++ */
 
-@keyframes wiggle {
+/*@keyframes wiggle {
   0% {
       transform: rotate(0deg);
   }
@@ -227,4 +228,4 @@ textarea#talk {
 .jump {
   animation: jump 1s infinite;
   transform-origin: center bottom;
-}
+}*/

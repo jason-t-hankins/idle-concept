@@ -7,6 +7,7 @@ import heart from './data/heart.png';
 import house from './data/house.png';
 import lightning from './data/lightning.png';
 import world from './data/world.png';
+import Friends from "./Components/Friends";
 
 //idle friend sim
 //friends over the world
@@ -19,7 +20,7 @@ function App() {
     
     var petName = 'jj';//getParameterByName('name');
     document.title = petName;
-    var chatWindow = "hidden";
+    const [chatWindow, setChatWindow] = useState("hidden");
 
 
     const [mood, setMood] = useState(50);
@@ -77,7 +78,7 @@ function App() {
 
 
    function chat() {
-        chatWindow = "visible";
+        setChatWindow("visible");
         //console.log("open chat window todo");
     }
 
@@ -125,25 +126,27 @@ function App() {
                         <td>Coins: <b id="coins">{coins}</b></td>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr className="window-body">
+                <tbody className="window-body">
+                    <tr style={{zIndex: -1}}>
                         <td colSpan="2">
                             <div id="map">
                                 <Three />
                                 {/*<div id="underlay"></div>*/}
-                                <div id="pet" className="pet">
+                                {/*<div id="pet" className="pet">
                                     <div id="petName-tag"></div>
-                                </div>
+                                </div>*/}
                             </div>
-                            <div id="overlay" style={{visibility: chatWindow}}></div>
-                            <div /*onClick={pettPet()}*/ id="overlay-pet-interact"></div>
+                            <div id="overlay" style={{visibility: chatWindow}}>
+                                <Friends />
+                            </div>
+                            {/*<div onClick={pettPet()} id="overlay-pet-interact"></div>*/}
                         </td>
 
-                        <td className="controls">
+                        <td className="controls" colSpan="1">
                             <b>Programs: </b>
                             <img className="shopitem" src={cart} /*onClick="feedPet(0);"*/ alt="." />
                             <img className="shopitem" src={gift} /*onClick="feedPet(0);"*/ alt="." />
-                            <img className="shopitem" src={heart} onClick={chat()} alt="chat with friends!" />
+                            <img className="shopitem" onClick={() => chat()} src={heart} alt="chat with friends!" />
                             <br />
                             <img className="shopitem" src={house} /*onClick="feedPet(2);"*/ alt="." />
                             <img className="shopitem" src={lightning} /*onClick="feedPet(1);"*/ alt="." />
