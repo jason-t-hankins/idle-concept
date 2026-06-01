@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import Log from './Components/Log';
 import reportWebVitals from './reportWebVitals';
 
 import "98.css";
@@ -13,8 +12,6 @@ root.render(
   //<React.StrictMode>
   <div>
     <App />
-    
-    <Log />
   </div>
     
   //</React.StrictMode>

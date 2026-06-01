@@ -7,8 +7,6 @@ import heart from './data/heart.png';
 import house from './data/house.png';
 import lightning from './data/lightning.png';
 import world from './data/world.png';
-import Friends from "./Components/Friends";
-import Log from "./Components/Log";
 
 const SAVE_KEY = "idle-embed-save-v1";
 
@@ -61,9 +59,8 @@ function cloneModifiers(overrides = {}) {
 
 function App() {
     const petName = 'jj';
-    const [chatWindow, setChatWindow] = useState("hidden");
-
     const [savedGame] = useState(() => loadSave());
+    const [activeProgram, setActiveProgram] = useState(() => savedGame?.activeProgram ?? 'globe');
     const [mood, setMood] = useState(savedGame?.mood ?? 50);
     const [hunger, setHunger] = useState(savedGame?.hunger ?? 50);
     const [coins, setCoins] = useState(savedGame?.coins ?? 10);
@@ -76,7 +73,6 @@ function App() {
         }
         return [{ from: 'system', text: `successfully logged in, ${petName} Welcome!`, moodAt: savedGame?.mood ?? 50, ts: Date.now() }];
     });
-    const messagesRef = useRef(null);
     const hungerWarningShown = useRef(false);
     const moodWarningShown = useRef(false);
 
@@ -106,13 +102,14 @@ function App() {
             coins,
             modifiers,
             messages,
+            activeProgram,
             // for backwards compatibility keep talk as joined text
             talk: messages.map(m => `${m.from}: ${m.text}`).join('\n'),
         };
 
         window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
         appendTalk("system", "game saved locally.");
-    }, [appendTalk, coins, hunger, modifiers, mood, messages]);
+    }, [activeProgram, appendTalk, coins, hunger, modifiers, mood, messages]);
 
     const resetGame = useCallback(() => {
         if (typeof window !== "undefined") {
@@ -123,8 +120,8 @@ function App() {
         setHunger(50);
         setCoins(10);
         setModifiers(cloneModifiers());
+        setActiveProgram('globe');
         setMessages([{ from: 'system', text: `successfully logged in, ${petName} Welcome!`, moodAt: 50, ts: Date.now() }]);
-        setChatWindow("hidden");
         hungerWarningShown.current = false;
         moodWarningShown.current = false;
     }, [petName]);
@@ -189,17 +186,6 @@ function App() {
     }, [appendTalk, mood]);
 
     useEffect(() => {
-        if (messagesRef.current) {
-            // works for both textarea and other scrollable containers
-            try {
-                messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-            } catch (e) {
-                // ignore
-            }
-        }
-    }, [messages]);
-
-    useEffect(() => {
         if (typeof window === "undefined") {
             return;
         }
@@ -210,16 +196,12 @@ function App() {
             coins,
             modifiers,
             messages,
+            activeProgram,
             talk: messages.map(m => `${m.from}: ${m.text}`).join('\n'),
         };
 
         window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    }, [coins, hunger, modifiers, mood, messages]);
-
-
-   function chat() {
-        setChatWindow("visible");
-    }
+    }, [activeProgram, coins, hunger, modifiers, mood, messages]);
 
     function hello() {
         setMood(m => m - 2);
@@ -239,10 +221,14 @@ function App() {
         appendTalk(petName, "sandwich time brb ily");
     }
 
+    function openProgram(program) {
+        setActiveProgram(program);
+    }
+
   return (
     <div className="App">
-        <div className='window' style={{width: 300+'px'}}>
-                <div className="title-bar" style={{width: 297+'px'}}>
+        <div className='window mainWindow'>
+                <div className="title-bar mainTitleBar">
                     <div className="title-bar-text">Welcome to Space, <b id="petName">{petName}</b></div>
                     <div className="title-bar-controls">
                         <button aria-label="Minimize" />
@@ -260,43 +246,52 @@ function App() {
                 </thead>
                 <tbody className="window-body">
                     <tr style={{zIndex: -1}}>
-                        <td colSpan="2">
+                        <td className="mapCell" colSpan="2">
                             <div id="map">
-                                <Three />
-                            </div>
-                            <div id="overlay" style={{visibility: chatWindow}}>
-                                <Friends />
+                                <Three
+                                    activeProgram={activeProgram}
+                                    messages={messages}
+                                    onCloseProgram={() => openProgram('globe')}
+                                />
                             </div>
                         </td>
 
-                        <td className="controls" colSpan="1">
-                            <b>Programs: </b>
-                            <img className="shopitem" src={cart} alt="." />
-                            <img className="shopitem" src={gift} alt="." />
-                            <img className="shopitem" onClick={() => chat()} src={heart} alt="chat with friends!" />
-                            <br />
-                            <img className="shopitem" src={house} alt="." />
-                            <img className="shopitem" src={lightning} alt="." />
-                            <img className="shopitem" src={world} alt="." />
-                            <b>Actions:</b>
-                            <button onClick={() => hello()}>Hello</button><br></br>
-                            <button onClick={() => eat()}>Kill Time</button><br></br>
-
-                            <button disabled onClick={() => resetGame()}>Goodbye</button><br></br>
+                        <td className="controlsCell">
+                            <div className="controls controlsStrip">
+                                <b>Programs:</b>
+                                <div className="controlsIcons">
+                                    <img className="shopitem" onClick={() => openProgram('shop')} src={cart} alt="shop" title="shop" />
+                                    <img className="shopitem" onClick={() => openProgram('log')} src={gift} alt="log" title="log" />
+                                    <img className="shopitem" onClick={() => openProgram('friends')} src={heart} alt="friends" title="friends" />
+                                    <img className="shopitem" onClick={() => openProgram('messages')} src={house} alt="messages" title="messages" />
+                                    <img className="shopitem" onClick={() => openProgram('job')} src={lightning} alt="job" title="job" />
+                                    <img className="shopitem" onClick={() => openProgram('globe')} src={world} alt="earth" title="earth" />
+                                </div>
+                                <b>Actions:</b>
+                                <div className="controlsButtons">
+                                    <button onClick={() => hello()}>Hello</button>
+                                    <button onClick={() => eat()}>Kill Time</button>
+                                    <button disabled onClick={() => resetGame()}>Goodbye</button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colSpan="3">
-                            <textarea id="talk" ref={messagesRef} className="messageList" readOnly value={messages.map(m => `${m.from}: ${m.text}`).join('\n')} />
+                            <textarea
+                                id="talk"
+                                className="messageList"
+                                readOnly
+                                value={messages.map(m => `${m.from}: ${m.text}`).join('\n')}
+                            />
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
-                <Log messages={messages} />
-                <label>test by butteredroll</label>
+        <label>test by butteredroll</label>
     </div>
   );
 }

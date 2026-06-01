@@ -61,11 +61,103 @@ td {
 }
 
 #map {
-  float: left;
-  position: absolute;
-  width: 200px;
-  height: 200px;
+  position: relative;
+  width: 240px;
+  height: 240px;
   background-size: 100%;
+  overflow: hidden;
+}
+
+#petTable {
+  width: 360px;
+  table-layout: fixed;
+}
+
+#petTable tbody td {
+  box-sizing: border-box;
+}
+
+.mapCell {
+  width: 240px;
+  height: 240px;
+  padding: 0;
+}
+
+.controlsCell {
+  width: 120px;
+  vertical-align: top;
+}
+
+.threeStage {
+  width: 240px;
+  height: 240px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainWindow {
+  width: min-content; /*bruh totally come fix this nd mainTitleBar*/
+}
+
+.mainTitleBar {
+  width: 99%;
+}
+
+.programWindow {
+  width: 180px;
+  min-height: 140px;
+  pointer-events: auto;
+}
+
+.programBody {
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111;
+}
+
+.programNote {
+  margin: 0 0 8px;
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+.programComingSoon {
+  padding: 14px 10px;
+  border: 1px dashed #999;
+  background: rgba(0, 0, 0, 0.03);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+
+.CSS3DObject,
+.programWindow {
+  transform-origin: center center;
+}
+
+.programWindow .window-body {
+  max-height: 140px;
+  overflow: auto;
+}
+
+#log {
+  margin-top: 10px;
+}
+
+#logData {
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.programWindow .message {
+  display: block;
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+.programWindow .message .from,
+.programWindow .message .text {
+  display: block;
 }
 
 .pet {
@@ -116,9 +208,9 @@ textarea#talk {
 }
 
 .message {
-  padding: 1px 1px;
-  margin-bottom: 1px;
-  font-size: 6px;
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  font-size: 11px;
   display: flex;
   gap: 8px;
 }
@@ -161,6 +253,30 @@ textarea#talk {
 .controls {
   vertical-align: text-top;
   z-index: 2;
+}
+
+.controlsStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 2x;
+}
+
+.controlsIcons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.controlsButtons {
+  display: flex;
+  gap: 1px;
+  flex-wrap: wrap;
+}
+
+.controlsButtons button {
+  flex: 1 1 0;
+  width: 100%;
 }
 
 .controls b {
