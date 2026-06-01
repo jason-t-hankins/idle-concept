@@ -4,8 +4,10 @@
     overflow: auto;*/
 }
 
-#logArea{
+#logData{
     background-color: black;
     color: chartreuse;
     resize: vertical;
+    max-height: 200px;
+    overflow-y: scroll;
 }

@@ -8,6 +8,7 @@ import house from './data/house.png';
 import lightning from './data/lightning.png';
 import world from './data/world.png';
 import Friends from "./Components/Friends";
+import Log from "./Components/Log";
 
 const SAVE_KEY = "idle-embed-save-v1";
 
@@ -67,8 +68,15 @@ function App() {
     const [hunger, setHunger] = useState(savedGame?.hunger ?? 50);
     const [coins, setCoins] = useState(savedGame?.coins ?? 10);
     const [modifiers, setModifiers] = useState(() => cloneModifiers(savedGame?.modifiers));
-    const [talk, setTalk] = useState(savedGame?.talk ?? ("successfully logged in, " + petName + " Welcome!"));
-    const talkBoxRef = useRef(null);
+    const [messages, setMessages] = useState(() => {
+        if (savedGame?.messages) return savedGame.messages;
+        if (savedGame?.talk) {
+            // convert old text log into messages
+            return savedGame.talk.split('\n').filter(Boolean).map(line => ({ from: 'anon', text: line, moodAt: savedGame?.mood ?? 50, ts: Date.now() }));
+        }
+        return [{ from: 'system', text: `successfully logged in, ${petName} Welcome!`, moodAt: savedGame?.mood ?? 50, ts: Date.now() }];
+    });
+    const messagesRef = useRef(null);
     const hungerWarningShown = useRef(false);
     const moodWarningShown = useRef(false);
 
@@ -77,8 +85,15 @@ function App() {
     }, [petName]);
 
     const appendTalk = useCallback((from, message) => {
-        setTalk((prev) => `${prev}\n${from}: ${message}`);
-    }, []);
+        setMessages(prev => {
+            const next = [...prev, { from, text: message, moodAt: typeof mood === 'number' ? mood : 50, ts: Date.now() }];
+            if (next.length > 50) {
+                // trim oldest messages to keep array at most 50
+                return next.slice(next.length - 50);
+            }
+            return next;
+        });
+    }, [mood]);
 
     const saveGame = useCallback(() => {
         if (typeof window === "undefined") {
@@ -90,12 +105,14 @@ function App() {
             hunger,
             coins,
             modifiers,
-            talk,
+            messages,
+            // for backwards compatibility keep talk as joined text
+            talk: messages.map(m => `${m.from}: ${m.text}`).join('\n'),
         };
 
         window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
         appendTalk("system", "game saved locally.");
-    }, [appendTalk, coins, hunger, modifiers, mood, talk]);
+    }, [appendTalk, coins, hunger, modifiers, mood, messages]);
 
     const resetGame = useCallback(() => {
         if (typeof window !== "undefined") {
@@ -106,7 +123,7 @@ function App() {
         setHunger(50);
         setCoins(10);
         setModifiers(cloneModifiers());
-        setTalk("successfully logged in, " + petName + " Welcome!");
+        setMessages([{ from: 'system', text: `successfully logged in, ${petName} Welcome!`, moodAt: 50, ts: Date.now() }]);
         setChatWindow("hidden");
         hungerWarningShown.current = false;
         moodWarningShown.current = false;
@@ -151,7 +168,7 @@ function App() {
 
     useEffect(() => {
         if (hunger <= 10 && !hungerWarningShown.current) {
-            appendTalk("system", "energy low... maybe take a break.");
+            appendTalk("system", "dead and hungreh.");
             hungerWarningShown.current = true;
         }
 
@@ -162,7 +179,7 @@ function App() {
 
     useEffect(() => {
         if (mood <= 10 && !moodWarningShown.current) {
-            appendTalk("system", "doomscrolling spiral detected.");
+            appendTalk("system", "you wanna die.");
             moodWarningShown.current = true;
         }
 
@@ -172,10 +189,15 @@ function App() {
     }, [appendTalk, mood]);
 
     useEffect(() => {
-        if (talkBoxRef.current) {
-            talkBoxRef.current.scrollTop = talkBoxRef.current.scrollHeight;
+        if (messagesRef.current) {
+            // works for both textarea and other scrollable containers
+            try {
+                messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+            } catch (e) {
+                // ignore
+            }
         }
-    }, [talk]);
+    }, [messages]);
 
     useEffect(() => {
         if (typeof window === "undefined") {
@@ -187,11 +209,12 @@ function App() {
             hunger,
             coins,
             modifiers,
-            talk,
+            messages,
+            talk: messages.map(m => `${m.from}: ${m.text}`).join('\n'),
         };
 
         window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    }, [coins, hunger, modifiers, mood, talk]);
+    }, [coins, hunger, modifiers, mood, messages]);
 
 
    function chat() {
@@ -266,13 +289,14 @@ function App() {
                 <tfoot>
                     <tr>
                         <td colSpan="3">
-                            <textarea id="talk" disabled={true} value={talk} ref={talkBoxRef} />
+                            <textarea id="talk" ref={messagesRef} className="messageList" readOnly value={messages.map(m => `${m.from}: ${m.text}`).join('\n')} />
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
-        <label>test by butteredroll</label>
+                <Log messages={messages} />
+                <label>test by butteredroll</label>
     </div>
   );
 }

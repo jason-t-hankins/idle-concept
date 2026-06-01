@@ -106,6 +106,50 @@ textarea#talk {
   font-size: 12px;
 }
 
+.messageList {
+  width: 96%;
+  max-height: 120px;
+  overflow-y: scroll;
+  background: transparent;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.message {
+  padding: 1px 1px;
+  margin-bottom: 1px;
+  font-size: 6px;
+  display: flex;
+  gap: 8px;
+}
+
+.message.system {
+  background: #e0e0e0;
+  color: #222;
+}
+
+.message.user {
+  background: rgba(255,255,255,0.04);
+}
+
+.message.mood-low {
+  background: rgba(128,0,0,0.5);
+  color: #fd8b8b;
+}
+
+.message.mood-high {
+  background: rgba(173,216,230,0.5);
+  color: #002233;
+}
+
+.message .from {
+  font-weight: 700;
+}
+
+.message .text {
+  white-space: pre-wrap;
+}
+
 .uiicon {
   width: 10px;
 }
