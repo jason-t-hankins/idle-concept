@@ -9,6 +9,16 @@ import lightning from './data/lightning.png';
 import world from './data/world.png';
 import Friends from "./Components/Friends";
 
+const SAVE_KEY = "idle-embed-save-v1";
+
+const DEFAULT_MODIFIERS = {
+    hungerDecay: 1,
+    moodDecay: 1,
+    coinGain: 1,
+    statTickMs: 3000,
+    chatterSpeed: 1,
+};
+
 const CHATTER = [
     "hey cutie", 
     "WTFFF LOL", 
@@ -22,15 +32,42 @@ const CHATTER = [
     "#derpression",
 ];
 
+function loadSave() {
+    if (typeof window === "undefined") {
+        return null;
+    }
+
+    try {
+        const rawSave = window.localStorage.getItem(SAVE_KEY);
+        return rawSave ? JSON.parse(rawSave) : null;
+    } catch {
+        return null;
+    }
+}
+
+function getChatterDelay(mood, chatterSpeed = 1) {
+    const extremity = Math.min(1, Math.abs(mood - 50) / 50);
+    const baseDelay = 4200 - (extremity * 3000);
+    return Math.max(600, Math.round(baseDelay / chatterSpeed));
+}
+
+function cloneModifiers(overrides = {}) {
+    return {
+        ...DEFAULT_MODIFIERS,
+        ...overrides,
+    };
+}
+
 function App() {
     const petName = 'jj';
     const [chatWindow, setChatWindow] = useState("hidden");
 
-
-    const [mood, setMood] = useState(50);
-    const [hunger, setHunger] = useState(50);
-    const [coins, setCoins] = useState(10);
-    const [talk, setTalk] = useState("successfully logged in, " + petName + " Welcome!");
+    const [savedGame] = useState(() => loadSave());
+    const [mood, setMood] = useState(savedGame?.mood ?? 50);
+    const [hunger, setHunger] = useState(savedGame?.hunger ?? 50);
+    const [coins, setCoins] = useState(savedGame?.coins ?? 10);
+    const [modifiers, setModifiers] = useState(() => cloneModifiers(savedGame?.modifiers));
+    const [talk, setTalk] = useState(savedGame?.talk ?? ("successfully logged in, " + petName + " Welcome!"));
     const talkBoxRef = useRef(null);
     const hungerWarningShown = useRef(false);
     const moodWarningShown = useRef(false);
@@ -43,19 +80,74 @@ function App() {
         setTalk((prev) => `${prev}\n${from}: ${message}`);
     }, []);
 
+    const saveGame = useCallback(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
 
-    //+++ Game Loop +++
+        const state = {
+            mood,
+            hunger,
+            coins,
+            modifiers,
+            talk,
+        };
+
+        window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        appendTalk("system", "game saved locally.");
+    }, [appendTalk, coins, hunger, modifiers, mood, talk]);
+
+    const resetGame = useCallback(() => {
+        if (typeof window !== "undefined") {
+            window.localStorage.removeItem(SAVE_KEY);
+        }
+
+        setMood(50);
+        setHunger(50);
+        setCoins(10);
+        setModifiers(cloneModifiers());
+        setTalk("successfully logged in, " + petName + " Welcome!");
+        setChatWindow("hidden");
+        hungerWarningShown.current = false;
+        moodWarningShown.current = false;
+    }, [petName]);
+
+
     useEffect(() => {
         const loop = setInterval(() => {
-            setHunger(h => h - 1);
-            setMood(m => m - 1);
-            setCoins(c => c + 1);
-            appendTalk("anon", CHATTER[Math.floor(Math.random() * CHATTER.length)]);
-        }, 3000);
+            setHunger(h => h - modifiers.hungerDecay);
+            setMood(m => m - modifiers.moodDecay);
+            setCoins(c => c + modifiers.coinGain);
+        }, modifiers.statTickMs);
         return () => {
             clearInterval(loop);
         };
-    }, [appendTalk]);
+    }, [modifiers.hungerDecay, modifiers.moodDecay, modifiers.coinGain, modifiers.statTickMs]);
+
+    useEffect(() => {
+        let cancelled = false;
+        let timerId;
+
+        const scheduleNextMessage = () => {
+            const delay = getChatterDelay(mood, modifiers.chatterSpeed);
+
+            timerId = window.setTimeout(() => {
+                if (cancelled) {
+                    return;
+                }
+
+                appendTalk("anon", CHATTER[Math.floor(Math.random() * CHATTER.length)]);
+                scheduleNextMessage();
+            }, delay);
+        };
+
+        scheduleNextMessage();
+
+        return () => {
+            cancelled = true;
+            window.clearTimeout(timerId);
+        };
+    }, [appendTalk, mood, modifiers.chatterSpeed]);
 
     useEffect(() => {
         if (hunger <= 10 && !hungerWarningShown.current) {
@@ -85,13 +177,30 @@ function App() {
         }
     }, [talk]);
 
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
+
+        const state = {
+            mood,
+            hunger,
+            coins,
+            modifiers,
+            talk,
+        };
+
+        window.localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    }, [coins, hunger, modifiers, mood, talk]);
+
 
    function chat() {
         setChatWindow("visible");
     }
 
     function hello() {
-        setMood(m => m + 5);
+        setMood(m => m - 2);
+        setCoins(c => c + 3);
         appendTalk(petName, "Hello lovers!!!");
     }
 
@@ -102,6 +211,7 @@ function App() {
         }
 
         setHunger(h => h + 5);
+        setMood(m => m + 2);
         setCoins(c => c - 5);
         appendTalk(petName, "sandwich time brb ily");
     }
@@ -114,7 +224,7 @@ function App() {
                     <div className="title-bar-controls">
                         <button aria-label="Minimize" />
                         <button aria-label="Maximize" />
-                        <button aria-label="Close" />
+                        <button onClick={() => saveGame()} aria-label="Close" />
                     </div>
                 </div>
             <table id="petTable" className="interactive">
@@ -130,34 +240,30 @@ function App() {
                         <td colSpan="2">
                             <div id="map">
                                 <Three />
-                                {/*<div id="underlay"></div>*/}
-                                {/*<div id="pet" className="pet">
-                                    <div id="petName-tag"></div>
-                                </div>*/}
                             </div>
                             <div id="overlay" style={{visibility: chatWindow}}>
                                 <Friends />
                             </div>
-                            {/*<div onClick={pettPet()} id="overlay-pet-interact"></div>*/}
                         </td>
 
                         <td className="controls" colSpan="1">
                             <b>Programs: </b>
-                            <img className="shopitem" src={cart} /*onClick="feedPet(0);"*/ alt="." />
-                            <img className="shopitem" src={gift} /*onClick="feedPet(0);"*/ alt="." />
+                            <img className="shopitem" src={cart} alt="." />
+                            <img className="shopitem" src={gift} alt="." />
                             <img className="shopitem" onClick={() => chat()} src={heart} alt="chat with friends!" />
                             <br />
-                            <img className="shopitem" src={house} /*onClick="feedPet(2);"*/ alt="." />
-                            <img className="shopitem" src={lightning} /*onClick="feedPet(1);"*/ alt="." />
-                            <img className="shopitem" src={world} /*onClick="feedPet(1);"*/ alt="." />
+                            <img className="shopitem" src={house} alt="." />
+                            <img className="shopitem" src={lightning} alt="." />
+                            <img className="shopitem" src={world} alt="." />
                             <b>Actions:</b>
                             <button onClick={() => hello()}>Hello</button><br></br>
                             <button onClick={() => eat()}>Kill Time</button><br></br>
-                            <button disabled /*onClick={() => party()}*/>Goodbye</button><br></br>
+
+                            <button disabled onClick={() => resetGame()}>Goodbye</button><br></br>
                         </td>
                     </tr>
                 </tbody>
-                <tfoot /*style={{height: 100+'px'}}*/>
+                <tfoot>
                     <tr>
                         <td colSpan="3">
                             <textarea id="talk" disabled={true} value={talk} ref={talkBoxRef} />
