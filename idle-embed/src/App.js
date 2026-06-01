@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import './App.css';
 import Three from './Three';
 import cart from './data/cart.png';
@@ -9,17 +9,21 @@ import lightning from './data/lightning.png';
 import world from './data/world.png';
 import Friends from "./Components/Friends";
 
-//idle friend sim
-//friends over the world
-//getting depressed kms
-
+const CHATTER = [
+    "hey cutie", 
+    "WTFFF LOL", 
+    "r u realll", 
+    "ur pussy, er describe it", 
+    "TROLLLLLL", 
+    "I will kill you", 
+    "is this google search okay show me big bobs woman",
+    "is this a simulation?",
+    "#depression",
+    "#derpression",
+];
 
 function App() {
-    //Load sounds
-    //var eatSound = new Audio('audio/ommnom.mp3');
-    
-    var petName = 'jj';//getParameterByName('name');
-    document.title = petName;
+    const petName = 'jj';
     const [chatWindow, setChatWindow] = useState("hidden");
 
 
@@ -27,84 +31,79 @@ function App() {
     const [hunger, setHunger] = useState(50);
     const [coins, setCoins] = useState(10);
     const [talk, setTalk] = useState("successfully logged in, " + petName + " Welcome!");
-    const chatter = ["hey cutie", "WTFFF LOL", "r u realll", "ur pussy, er describe it", "TROLLLLLL", "I will kill you", "is this google search okay show me big boobs woman"]
-    const talkBottom = useRef(null);
+    const talkBoxRef = useRef(null);
+    const hungerWarningShown = useRef(false);
+    const moodWarningShown = useRef(false);
 
-    //DOM elements
-    //var pet = document.getElementById('pet');
-    //var map = document.getElementById('map');
-    var talkBox = document.getElementById('talk');
-    //var petNameBox = document.getElementById('petName');
-    //const [moodBox, setMoodBox] = useState(mood);
-    //const [hungerBox, setHungerBox] = useState(hunger);
-    //const [coinsBox, setCoinsBox] = useState(coins);
-    //var petNameTag = document.getElementById('petName-tag');
-    //var overlay = document.getElementById('overlay');
-    //var underlay = document.getElementById('underlay');
-    //var petInteract = document.getElementById('overlay-pet-interact');
-    //var petTable = document.getElementById('petTable');
+    useEffect(() => {
+        document.title = petName;
+    }, [petName]);
+
+    const appendTalk = useCallback((from, message) => {
+        setTalk((prev) => `${prev}\n${from}: ${message}`);
+    }, []);
 
 
     //+++ Game Loop +++
     useEffect(() => {
         const loop = setInterval(() => {
-
             setHunger(h => h - 1);
             setMood(m => m - 1);
-            setCoins(c => c + 1/*mood / 600*/);
-
-            //Hunger
-            if (hunger <= 10) {
-                //break;
-                speak('death',"hey hey, what's up??");
-            }
-            //Mood
-            if (mood <= 10) {
-                speak('death','game over, man.');
-            }
-            //Coins
-
-            //Function calls
-            //teMain();
-            //speakAnimator();
-            //rainFall();
-            //movePet();
-            //petTalk();
-            //autoEat();
-            speak("anon", chatter[Math.floor(Math.random() * (chatter.length - 1))]);
+            setCoins(c => c + 1);
+            appendTalk("anon", CHATTER[Math.floor(Math.random() * CHATTER.length)]);
         }, 3000);
-        return () => {clearInterval(loop);}
-    });
+        return () => {
+            clearInterval(loop);
+        };
+    }, [appendTalk]);
+
+    useEffect(() => {
+        if (hunger <= 10 && !hungerWarningShown.current) {
+            appendTalk("system", "energy low... maybe take a break.");
+            hungerWarningShown.current = true;
+        }
+
+        if (hunger > 10) {
+            hungerWarningShown.current = false;
+        }
+    }, [appendTalk, hunger]);
+
+    useEffect(() => {
+        if (mood <= 10 && !moodWarningShown.current) {
+            appendTalk("system", "doomscrolling spiral detected.");
+            moodWarningShown.current = true;
+        }
+
+        if (mood > 10) {
+            moodWarningShown.current = false;
+        }
+    }, [appendTalk, mood]);
+
+    useEffect(() => {
+        if (talkBoxRef.current) {
+            talkBoxRef.current.scrollTop = talkBoxRef.current.scrollHeight;
+        }
+    }, [talk]);
 
 
    function chat() {
         setChatWindow("visible");
-        //console.log("open chat window todo");
     }
 
     function hello() {
         setMood(m => m + 5);
-        speak(petName, "Hello Lovers!!!");
+        appendTalk(petName, "Hello lovers!!!");
     }
 
     function eat() {
+        if (coins < 5) {
+            appendTalk("system", "not enough coins to kill time.");
+            return;
+        }
+
         setHunger(h => h + 5);
         setCoins(c => c - 5);
-        speak(petName, "sanwich time brb ily");
-    }
-
-
-    function speak(from, message) {
-        if (from === petName) {
-            //speakTimer = 0;
-            //pet.classList.add('jump');
-        }
-    
-        setTalk(talk + '\n' + from + ': ' + message)
-        //talkBottom.current.scrollIntoView({behavior: "instant", block: "nearest"});
-        //talkBox.value = talk;
-        if (talkBox?.scrollHeight)
-            talkBox.scrollTop = talkBox.scrollHeight;
+        appendTalk(petName, "sandwich time brb ily");
     }
 
   return (
@@ -161,10 +160,7 @@ function App() {
                 <tfoot /*style={{height: 100+'px'}}*/>
                     <tr>
                         <td colSpan="3">
-                            <textarea id="talk" disabled={true} value={talk}
-                                onChange={e => setTalk(e.target.value)} ref={talkBottom}
-                                scrollHeight = "0"
-                            />
+                            <textarea id="talk" disabled={true} value={talk} ref={talkBoxRef} />
                         </td>
                     </tr>
                 </tfoot>

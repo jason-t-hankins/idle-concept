@@ -8,7 +8,7 @@ class Three extends Component {
         const scene = new THREE.Scene();
         scene.add(new THREE.AmbientLight(0xffffff, 10));
         scene.add(new THREE.DirectionalLight(0xffffff, 100));
-        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
 
         const renderer = new THREE.WebGLRenderer({alpha: true});
         renderer.setSize( 200, 200 );
@@ -25,8 +25,10 @@ class Three extends Component {
 
         camera.position.z = 5;
 
+        let frameId;
+
         function animate() {
-            requestAnimationFrame( animate );
+            frameId = requestAnimationFrame( animate );
 
             //cube.rotation.x -= 0.01;
             cube.rotation.y -= 0.01;
@@ -37,7 +39,25 @@ class Three extends Component {
         //function stopEarth(){cube.rotation.y = 0;}
 
         animate();
+
+        this.cleanup = () => {
+            cancelAnimationFrame(frameId);
+            if (this.mount && renderer.domElement && this.mount.contains(renderer.domElement)) {
+                this.mount.removeChild(renderer.domElement);
+            }
+            geometry.dispose();
+            material.dispose();
+            texture.dispose();
+            renderer.dispose();
+        };
     }
+
+    componentWillUnmount() {
+        if (this.cleanup) {
+            this.cleanup();
+        }
+    }
+
     render() {
         return (
           <div ref={ref => (this.mount = ref)} />

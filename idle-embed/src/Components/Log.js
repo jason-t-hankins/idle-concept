@@ -1,10 +1,16 @@
 import Draggable from "react-draggable";
+import { useState } from "react";
 import "./Log.css"
 
 function Log(){
+    const [isOpen, setIsOpen] = useState(true);
 
     function close(){
-        //this.state.render = false
+        setIsOpen(false);
+    }
+
+    if (!isOpen) {
+        return null;
     }
 
     return(
@@ -15,13 +21,11 @@ function Log(){
                         <div className="title-bar-text">Log</div>
                         <div className="title-bar-controls">
                             <button aria-label="Help" />
-                            <button aria-label="Close" onClick={close()}/>
+                            <button aria-label="Close" onClick={close} />
                         </div>
                     </div>
                     <div id="logData">todo import log wtf this shit hard</div>
-                    <textarea id="logArea" disabled={true} value={"hi"}
-                        scrollHeight = "0"
-                    />
+                    <textarea id="logArea" disabled={true} value={"hi"} readOnly />
                 </div>
             </div>
         </Draggable>

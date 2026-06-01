@@ -10,8 +10,10 @@ import e from "../data/users/75.gif"
 
 function Friends(){
 
-    var users = [a, b, c, d, e]
-    var display = users.map((user)=> <img src={user} width={30} alt={user}></img>)
+    const users = [a, b, c, d, e]
+    const display = users.map((user, index) => (
+        <img key={index} src={user} width={30} alt={`friend-${index + 1}`} />
+    ));
 
     return(
         <div className="window">
@@ -23,7 +25,7 @@ function Friends(){
                     </div>
             </div>
             <p>all of your friends!!</p>
-            <div id="friendContainer">{display}</div>
+            <div className="friendContainer">{display}</div>
         </div>
     );
 }

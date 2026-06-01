@@ -1,7 +1,7 @@
 body {
   font-family: 'Times New Roman', serif;
-  padding: none;
-  margin: none;
+  padding: 0;
+  margin: 0;
   color: black;
 }
 
@@ -16,8 +16,8 @@ a {
 }
 
 img {
-  padding: none;
-  margin: none;
+  padding: 0;
+  margin: 0;
 }
 
 footer {
